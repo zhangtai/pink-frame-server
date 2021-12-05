@@ -74,7 +74,7 @@ def create_new_postcard(output_path, sensor_img):
     for im_key, image in imlist.items():
         imtemp = Image.open(output_path + im_key)
         resized_im = imtemp.resize((round(imtemp.size[0] * 1.35), round(imtemp.size[1] * 1.35)))
-        offset = imlist[im_key]
+        offset = image
         bgimage.paste(resized_im, offset)
 
     sensor_offset_y = 60
@@ -88,6 +88,14 @@ def create_new_postcard(output_path, sensor_img):
     im_name = 'weather_postcard' + timestamp + '.png'
     base_dir = os.getcwd()
     path = os.path.join(base_dir, output_path, im_name)
+    draw = ImageDraw.Draw(bgimage)
+    draw.text(
+        (1500, 1320),
+        str(datetime.now()),
+        (0, 0, 0),
+        font=ImageFont.truetype("resources/fonts/Arial.ttf", 28), 
+        align='center'
+    )
     bgimage.save(path, 'bmp')
 
     os.system(f"cd {output_path} && rm -rf gz* yl* sensor*")
@@ -96,12 +104,10 @@ def create_new_postcard(output_path, sensor_img):
 
 def produce_sensor_data(input_path, output_path):
     base_url = f"{os.environ['HOME_ASSISTANT_SERVER']}/api/states/sensor."
-    print("HOME ASSISTANT SERVER: " + base_url)
     headers = {
         "Authorization": f"Bearer {os.environ['HOME_ASSISTANT_TOKEN']}",
         "Content-Type": "application/json",
     }
-    print("Getting sensor_list")
     sensor_list = {
         "Living Room": '158d000201ba3f',
         "Bedroom": '158d0002028531',
@@ -115,9 +121,7 @@ def produce_sensor_data(input_path, output_path):
         print(f"Getting for room {key}")
         temp_url = base_url + 'temperature_' + sensor_id
         humi_url = base_url + 'humidity_' + sensor_id
-        print(temp_url)
         temperature = requests.request("GET", temp_url, headers=headers).json()['state'] + ' °C'
-        print(humi_url)
         humidity = requests.request("GET", humi_url, headers=headers).json()['state'] + ' %'
 
         temp_img = Image.open(input_path + 'sensor_bg.png')
