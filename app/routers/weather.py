@@ -43,6 +43,7 @@ def load_page(url_key, url, output_path):
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--start-maximized')
+    chrome_options.add_argument(f"--proxy-server={os.environ['PROXY_SERVER']}")
 
     driver = webdriver.Chrome(options=chrome_options)
     driver.set_window_size(800, 3000)
@@ -112,8 +113,8 @@ def produce_sensor_data(input_path, output_path):
 
     for key, sensor_id in sensor_list.items():
         print(f"Getting for room {key}")
-        temp_url = base_url + 'temperature_lumi_' + sensor_id
-        humi_url = base_url + 'humidity_lumi_' + sensor_id
+        temp_url = base_url + 'temperature_' + sensor_id
+        humi_url = base_url + 'humidity_' + sensor_id
         print(temp_url)
         temperature = requests.request("GET", temp_url, headers=headers).json()['state'] + ' °C'
         print(humi_url)
