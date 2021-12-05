@@ -20,8 +20,10 @@ async def get_weather():
 
 
 def generate_image():
-    urls = {'gz': 'https://weather.com/zh-CN/weather/today/l/8531a23947fdad24dcfb9cd37e6d6bd77617fa7c8b242e4773c74381cf55845b',
-            'yl': 'https://weather.com/zh-CN/weather/today/l/9de9f2a3405e9d73c726ff55c4d29e922ea72308adfa5b47742d5fea473ef105'}
+    urls = {
+        'gz': 'https://weather.com/zh-CN/weather/today/l/8531a23947fdad24dcfb9cd37e6d6bd77617fa7c8b242e4773c74381cf55845b',
+        'yl': 'https://weather.com/zh-CN/weather/today/l/9de9f2a3405e9d73c726ff55c4d29e922ea72308adfa5b47742d5fea473ef105'
+    }
     output_path = 'output/'
     input_path = 'resources/'
 
@@ -53,9 +55,11 @@ def load_page(url_key, url, output_path):
 
 
 def get_screenshot_of_element(output_path, driver, url_key):
-    elements = {'current': 'WxuCurrentConditions-main-b3094163-ef75-4558-8d9a-e35e6b9b1034',
-                'main': 'WxuTodayWeatherCard-main-486ce56c-74e0-4152-bd76-7aea8e98520a',
-                'detail': 'todayDetails'}
+    elements = {
+        'current': 'WxuCurrentConditions-main-b3094163-ef75-4558-8d9a-e35e6b9b1034',
+        'main': 'WxuTodayWeatherCard-main-486ce56c-74e0-4152-bd76-7aea8e98520a',
+        'detail': 'todayDetails'
+    }
     for ele_key, ele in elements.items():
         image_name = url_key + ele_key + '.png'
         driver.find_element_by_id(ele).screenshot(output_path + image_name)
@@ -97,15 +101,22 @@ def produce_sensor_data(input_path, output_path):
         "Content-Type": "application/json",
     }
     print("Getting sensor_list")
-    sensor_list = {"Living Room": '158d000201ba3f', "Bedroom": '158d0002028531', "Reading Room": '158d0004072c42'}
+    sensor_list = {
+        "Living Room": '158d000201ba3f',
+        "Bedroom": '158d0002028531',
+        "Reading Room": '158d0004072c42'
+    }
     sensor_img = []
-    title_font = ImageFont.truetype("examples/Arial.ttf", 28)
-    data_font = ImageFont.truetype("examples/Arial.ttf", 45)
+    title_font = ImageFont.truetype("resources/fonts/Arial.ttf", 28)
+    data_font = ImageFont.truetype("resources/fonts/Arial.ttf", 45)
 
-    for key, sensor in sensor_list.items():
-        temp_url = base_url + 'temperature_lumi_' + sensor_list[key]
-        humi_url = base_url + 'humidity_lumi_' + sensor_list[key]
+    for key, sensor_id in sensor_list.items():
+        print(f"Getting for room {key}")
+        temp_url = base_url + 'temperature_lumi_' + sensor_id
+        humi_url = base_url + 'humidity_lumi_' + sensor_id
+        print(temp_url)
         temperature = requests.request("GET", temp_url, headers=headers).json()['state'] + ' °C'
+        print(humi_url)
         humidity = requests.request("GET", humi_url, headers=headers).json()['state'] + ' %'
 
         temp_img = Image.open(input_path + 'sensor_bg.png')
